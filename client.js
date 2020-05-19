@@ -1,4 +1,5 @@
 const net = require('net');
+const parser = require('./parser');
 
 class Request {
   constructor(options) {
@@ -179,7 +180,6 @@ class TruckedBodyParser {
       }
     } else if (this.current === this.READING_TRUNK) {
       this.content.push(char);
-      console.log(this.content)
       this.length --;
       if (this.length === 0) {
         this.current = this.WAITING_NEW_LINE;
@@ -212,4 +212,8 @@ void async function() {
   })
   let response = await request.send();
   console.log(response);
+
+  let dom = parser.parseHTML(response.body);
+  console.log(dom);
+
 }();
