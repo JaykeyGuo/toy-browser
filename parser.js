@@ -9,12 +9,59 @@ let currentTextNode = null;
 let rules = [];
 function addCSSRules(text) {
   var ast = css.parse(text);
-  console.log(JSON.stringify(ast, null, '  '));
+  // console.log(JSON.stringify(ast, null, '  '));
   rules.push(...ast.stylesheet.rules);
 }
 
 function match(element, selector) {
+  if (!selector || !element.attributes) {
+    return false;
+  }
 
+  if (selector.charAt(0) === '#') {
+    var attr = element.attributes.filter(attr => attr.name === 'id')[0];
+    if (attr && attr.value === selector.replace('#', '')) {
+      return true;
+    }
+  } else if (selector.charAt(0) === '.') {
+    var attr = element.attributes.filter(attr => attr.name === 'class')[0];
+    if (attr && attr.value === selector.replace('.', '')) {
+      return true;
+    }
+  } else {
+    if (element.tagName === selector) {
+      return true;
+    }
+  }
+  return false;
+}
+
+function specificity(selector) {
+  var p = [0, 0, 0, 0];
+  var selectorParts = selector.split(' ');
+  for (var part of selectorParts) {
+    if (part.charAt(0) === '#') {
+      p[1] += 1;
+    } else if (part.charAt(0) === '.') {
+      p[2] += 1;
+    } else {
+      p[3] += 1;
+    }
+  }
+  return p;
+}
+
+function compare(sp1, sp2) {
+  if (sp1[0] - sp2[0]) {
+    return sp1[0] - sp2[0];
+  }
+  if (sp1[1] - sp2[1]) {
+    return sp1[1] - sp2[1];
+  }
+  if (sp1[2] - sp2[2]) {
+    return sp1[2] - sp2[2];
+  }
+  return sp1[3] - sp2[3];
 }
 
 function computeCSS(element) {
@@ -24,7 +71,7 @@ function computeCSS(element) {
   }
 
   for (let rule of rules) {
-    var selectorParts = rule.selectores[0].split(' ').reverse();
+    var selectorParts = rule.selectors[0].split(' ').reverse();
     if(!match(element, selectorParts[0])) {
       continue;
     }
@@ -42,7 +89,23 @@ function computeCSS(element) {
     }
 
     if (matched) {
-      console.log(`Element ${element} matched rule ${rule}`); // 匹配成功
+      var sp = specificity(rule.selectors[0]);
+      var computedStyle = element.computedStyle;
+      for (var declaration of rule.declarations) {
+        if (!computedStyle[declaration.property]) {
+          computedStyle[declaration.property] = {};
+        }
+
+        if (!computedStyle[declaration.property].specificity) {
+          computedStyle[declaration.property].value = declaration.value;
+          computedStyle[declaration.property].specificity = sp;
+        } else if (compare(computedStyle[declaration.property].specificity, sp) < 0) {
+          computedStyle[declaration.property].value = declaration.value;
+          computedStyle[declaration.property].specificity = sp;
+        }
+      }
+      // console.log(`Element ${element} matched rule ${rule}`); // 匹配成功
+      console.log(JSON.stringify(element, null, '  ')); // 匹配成功
     }
   }
 }
@@ -77,12 +140,12 @@ function emit(token) {
     }
 
     currentTextNode = null;
+
   } else if (token.type === 'endTag') {
     if (top.tagName !== token.tagName) {
       throw new Error('Tag start end doesn\'t match!');
     } else {
       if (top.tagName === 'style') {
-        console.log(top.children[0].content);
         addCSSRules(top.children[0].content);
       }
       stack.pop();
@@ -246,7 +309,7 @@ function singleQuotedAttributeValue(c) {
 
   } else {
     currentAttribute.value += c;
-    return singleQuotedAttributeValue;
+    return doubleQuotedAttributeValue;
   }
 }
 
@@ -321,10 +384,9 @@ function endTagOpen(c) {
 module.exports.parseHTML = function parseHTML(html) {
   let state = data;
   for (let c of html) {
-    // console.log(c, state)
     state = state(c);
   }
   state = state(EOF);
   console.log(stack[0]);
-  // console.log((stack[0].children[1].children));
+  return stack[0];
 }
