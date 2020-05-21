@@ -18,10 +18,13 @@ body div img{
   width:30px;
   background-color: #ff1111;
 }
+.test.ts {
+  border: 1px solid #ccc;
+}
 </style>
 </head>
 <body>
-  <div>
+  <div class="test ts">
     <img id="myid"/>
     <img />
   </div>

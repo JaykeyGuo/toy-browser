@@ -17,7 +17,7 @@ function match(element, selector) {
   if (!selector || !element.attributes) {
     return false;
   }
-
+  console.log(element.attributes.filter(e => e.name === 'class'));
   if (selector.charAt(0) === '#') {
     var attr = element.attributes.filter(attr => attr.name === 'id')[0];
     if (attr && attr.value === selector.replace('#', '')) {
@@ -387,6 +387,6 @@ module.exports.parseHTML = function parseHTML(html) {
     state = state(c);
   }
   state = state(EOF);
-  console.log(stack[0]);
+  // console.log(stack[0]);
   return stack[0];
 }
