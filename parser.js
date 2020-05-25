@@ -1,4 +1,5 @@
 const css = require('css');
+const layout = require('./layout');
 
 let currentToken = null;
 let currentAttribute = null;
@@ -17,7 +18,7 @@ function match(element, selector) {
   if (!selector || !element.attributes) {
     return false;
   }
-  console.log(element.attributes.filter(e => e.name === 'class'));
+
   if (selector.charAt(0) === '#') {
     var attr = element.attributes.filter(attr => attr.name === 'id')[0];
     if (attr && attr.value === selector.replace('#', '')) {
@@ -100,12 +101,12 @@ function computeCSS(element) {
           computedStyle[declaration.property].value = declaration.value;
           computedStyle[declaration.property].specificity = sp;
         } else if (compare(computedStyle[declaration.property].specificity, sp) < 0) {
-          computedStyle[declaration.property].value = declaration.value;
-          computedStyle[declaration.property].specificity = sp;
+          for (var k = 0; k < 4; k++) {
+            computedStyle[declaration.property][declaration.value][k] += sp[k];
+          }
         }
       }
-      // console.log(`Element ${element} matched rule ${rule}`); // 匹配成功
-      console.log(JSON.stringify(element, null, '  ')); // 匹配成功
+      // console.log(element.computedStyle);
     }
   }
 }
@@ -133,7 +134,7 @@ function emit(token) {
     computeCSS(element); // TODO: 计算CSS的位置很重要，这里会触发重排，然后触发重绘
 
     top.children.push(element);
-    element.parent = top;
+    // element.parent = top;
 
     if (!token.isSelfClosing) {
       stack.push(element);
@@ -150,6 +151,7 @@ function emit(token) {
       }
       stack.pop();
     }
+    layout(top);
     currentTextNode = null;
   } else if (token.type === 'text') {
     if (currentTextNode === null) {
@@ -387,6 +389,5 @@ module.exports.parseHTML = function parseHTML(html) {
     state = state(c);
   }
   state = state(EOF);
-  // console.log(stack[0]);
   return stack[0];
 }
