@@ -10,7 +10,7 @@ const server = http.createServer((req, res) => {
 <html maaa=a >
 <head>
 <style>
-#id.background {
+.background {
   display: flex;
   width: 800px;
   height: 600px;

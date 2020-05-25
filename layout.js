@@ -27,13 +27,12 @@ function layout(element) {
   if (elementStyle.display !== 'flex') {
     return;
   }
+
   var items = element.children.filter(e => e.type === 'element');
-  // console.log(items)
 
   items.sort((a, b) => (a.order || 0) - (b.order || 0));
 
   var style = elementStyle;
-  console.log(style);
 
   ['width', 'height'].forEach(size => {
     if (style[size] === 'auto' || style[size] === '') {
@@ -41,25 +40,31 @@ function layout(element) {
     }
   })
 
-  if (!style.flexDirection || style.flexDirection === 'auto') {
-    style.flexDirection = 'row';
+
+  // if (!style.flexDirection || style.flexDirection === 'auto') {
+  if (!style['flex-direction'] || style['flex-direction'] === 'auto') {
+    style['flex-direction'] = 'row';
   }
-  if (!style.alignItems || style.alignItems === 'auto') {
-    style.alignItems = 'stretch';
+  // if (!style.alignItems || style.alignItems === 'auto') {
+  if (!style['align-items'] || style['align-items'] === 'auto') {
+    style['align-items'] = 'stretch';
   }
-  if (!style.justifyContent || style.justifyContent === 'auto') {
-    style.justifyContent = 'flex-start';
+  //   if (!style.justifyContent || style.justifyContent === 'auto') {
+  if (!style['justify-content'] || style['justify-content'] === 'auto') {
+    style['justify-content'] = 'flex-start';
   }
-  if (!style.flexWrap || style.flexWrap === 'auto') {
-    style.flexWrap = 'nowrap';
+  // if (!style.flexWrap || style.flexWrap === 'auto') {
+  if (!style['flex-wrap'] || style['flex-wrap'] === 'auto') {
+    style['flex-wrap'] = 'nowrap';
   }
-  if (!style.alignContent || style.alignContent === 'auto') {
-    style.alignContent = 'stretch';
+  // if (!style.alignContent || style.alignContent === 'auto') {
+  if (!style['align-content'] || style['align-content'] === 'auto') {
+    style['align-content'] = 'stretch';
   }
 
   var mainSize, mainStart, mainEnd, mainSign, mainBase,
     crossSize, crossStart, crossEnd, crossSign, corssBase;
-  if (style.flexDirection === 'row') {
+  if (style['flex-direction'] === 'row') {
     mainSize = 'width';
     mainStart = 'left';
     mainEnd = 'right';
@@ -71,7 +76,7 @@ function layout(element) {
     crossEnd = 'bottom';
   }
 
-  if (style.flexDirection === 'row-reverse') {
+  if (style['flex-direction'] === 'row-reverse') {
     mainSize = 'width';
     mainStart = 'right';
     mainEnd = 'left';
@@ -83,7 +88,7 @@ function layout(element) {
     crossEnd = 'bottom';
   }
 
-  if (style.flexDirection === 'column') {
+  if (style['flex-direction'] === 'column') {
     mainSize = 'height';
     mainStart = 'top';
     mainEnd = 'bottom';
@@ -95,7 +100,7 @@ function layout(element) {
     crossEnd = 'right';
   }
 
-  if (style.flexDirection === 'column-reverse') {
+  if (style['flex-direction'] === 'column-reverse') {
     mainSize = 'height';
     mainStart = 'bottom';
     mainEnd = 'top';
@@ -107,7 +112,7 @@ function layout(element) {
     crossEnd = 'right';
   }
 
-  if (style.flexWrap === 'wrap-reverse') {
+  if (style['flex-wrap'] === 'wrap-reverse') {
     var tmp = crossStart;
     crossStart = crossEnd;
     crossEnd = tmp;
@@ -146,7 +151,7 @@ function layout(element) {
 
     if (itemStyle.flex) {
       flexLine.push(item);
-    } else if (style.flexWrap === 'nowrap' && isAutoMainSize) {
+    } else if (style['flex-wrap'] === 'nowrap' && isAutoMainSize) {
       mainSpace -= itemStyle[mainSize];
       if (itemStyle[crossSize] !== null && itemStyle[crossSize] !== (void 0)) {
         crossSpace = Math.max(crossSpace, itemStyle[crossSize]);
@@ -176,7 +181,7 @@ function layout(element) {
   flexLine.mainSpace = mainSpace;
 
 
-  if (style.flexWrap === 'nowrap' || isAutoMainSize) {
+  if (style['flex-wrap'] === 'nowrap' || isAutoMainSize) {
     flexLine.crossSpace = (style[crossSize] !== (void 0)) ? style[crossSize] : crossSpace;
   } else {
     flexLine.crossSpace = crossSpace;
@@ -227,25 +232,23 @@ function layout(element) {
           currentMain = itemStyle[mainEnd];
         }
       } else {
-        // console.log(item);
-        // console.log(style)
-        if (style.justifyContent === 'flex-start') {
+        if (style['justify-content'] === 'flex-start') {
           var currentMain = mainBase;
           var step = 0;
         }
-        if (style.justifyContent === 'flex-end') {
+        if (style['justify-content'] === 'flex-end') {
           var currentMain = mainSpace * mainSign + mainBase;
           var step = 0;
         }
-        if (style.justifyContent === 'center') {
+        if (style['justify-content'] === 'center') {
           var currentMain = mainSpace / 2 * mainSign + mainBase;
           var step = 0;
         }
-        if (style.justifyContent === 'space-between') {
+        if (style['justify-content'] === 'space-between') {
           var currentMain = mainBase;
           var step = mainSpace / (item.length - 1) * mainSign;
         }
-        if (style.justifyContent === 'space-around') {
+        if (style['justify-content'] === 'space-around') {
           var step = mainSpace / items.length * mainSign;
           var currentMain = step / 2 + mainBase;
         }
@@ -276,7 +279,7 @@ function layout(element) {
     }
   }
 
-  if (style.flexWrap === 'wrap-reverse') {
+  if (style['flex-wrap'] === 'wrap-reverse') {
     corssBase = style[crossSize];
   } else {
     corssBase = 0;
@@ -286,40 +289,40 @@ function layout(element) {
 
   var step;
 
-  if (style.alignContent === 'flex-start') {
+  if (style['align-content'] === 'flex-start') {
     corssBase += 0;
     step = 0;
   }
-  if (style.alignContent === 'flex-end') {
+  if (style['align-content'] === 'flex-end') {
     corssBase += crossSign * crossSpace;
     step = 0;
   }
-  if (style.alignContent === 'center') {
+  if (style['align-content'] === 'center') {
     corssBase += crossSign * crossSpace / 2;
     step = 0;
   }
-  if (style.alignContent === 'space-between') {
+  if (style['align-content'] === 'space-between') {
     corssBase += 0;
     step = crossSpace / (flexLines.length - 1);
   }
-  if (style.alignContent === 'space-around') {
+  if (style['align-content'] === 'space-around') {
     step = corssBase / (flexLines.length);
     corssBase += crossSign * step / 2;
   }
-  if (style.alignContent === 'stretch') {
+  if (style['align-content'] === 'stretch') {
     corssBase += 0;
     step = 0;
   }
 
   flexLines.forEach((items) => {
-    var lineCrossSize = style.alignContent === 'stretch'
+    var lineCrossSize = style['align-content'] === 'stretch'
           ? items.crossSpace + crossSpace / flexLines.length
           : items.crossSpace;
     for (var i = 0; i < items.length; i++) {
       var item = items[i];
       var itemStyle = getStyle(item);
 
-      var align = itemStyle.alignSelf || style.alignItems;
+      var align = itemStyle.alignSelf || style['align-items'];
 
       if (item === null) {
         itemStyle[crossSize] = (align === 'stretch') ? lineCrossSize : 0;
@@ -344,7 +347,7 @@ function layout(element) {
     }
     corssBase += crossSign * (lineCrossSize + step);
   })
-  // console.log(items, 'layout');
+  // console.log(JSON.stringify(items, null, '  '));
 }
 
 module.exports = layout;

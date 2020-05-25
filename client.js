@@ -214,15 +214,11 @@ void async function() {
     }
   })
   let response = await request.send();
-  // console.log(response);
 
   let dom = parser.parseHTML(response.body);
-
-  let viewport = images(800, 600);
-  // console.log(dom)
-  // render(viewport, dom.children[0].children[3].children[1].children[1]);
-  render(viewport, dom);
-  viewport.save('viewport.jpg');
   // console.log(JSON.stringify(dom, null, '  '));
 
+  let viewport = images(800, 600);
+  render(viewport, dom);
+  viewport.save('viewport.jpg');
 }();
